@@ -1,4 +1,5 @@
 import Discord from "discord.io";
+import handlers from "./handlers";
 import logger from "./logger";
 
 require("dotenv").config();
@@ -15,48 +16,59 @@ const bot = new Discord.Client({
 });
 
 bot.on("ready", () => {
-  logger.info(`Connected! Logged in as: ${bot.username} - (${bot.id})`);
+  logger.info(
+    `[bot] connected - logged in as: ${bot.username} - id: ${bot.id}`
+  );
 });
 
 bot.on(
   "message",
-  (user: any, userID: any, channelID: any, message: string, evt: any) => {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `!`
-    logger.verbose(`user: ${user}`);
-    logger.verbose(`userID: ${userID}`);
-    logger.verbose(`channelID: ${channelID}`);
-    logger.verbose(`message: ${message}`);
-    logger.verbose(`evt: ${evt}`);
+  (
+    user: string,
+    userID: string,
+    channelID: string,
+    message: string,
+    evt: object
+  ) => {
+    logger.verbose(
+      `[bot] message event - user: ${user} - userID: ${userID} - channelID: ${channelID} - message: ${message}`
+    );
 
-    if (message.substring(0, 1) === "!") {
-      let args = message.substring(1).split(" ");
-      const cmd = args[0];
+    const applicableHandlers = handlers.filter((handler) =>
+      handler.applicable(message)
+    );
 
-      args = args.splice(1);
-      switch (cmd) {
-        // !ping
-        case "carlsucks":
-          bot.sendMessage({
-            message: "HEJ på dig din jävel",
-            to: channelID
-          });
-          break;
-        // Just add any case commands if you want to..
-      }
+    if (applicableHandlers.length > 0) {
+      const channelMessage = { user, userID, channelID, message, evt };
+      applicableHandlers.forEach((handler) => {
+        logger.verbose(`[bot] running handler: ${handler.name}`);
+        handler.process(bot, logger, channelMessage);
+      });
     }
   }
 );
 
 bot.on("disconnect", (errMsg, code) => {
-  logger.info(`Disconnected. Error: ${errMsg} (code ${code})`);
+  logger.info(`[bot] disconnected - error: ${errMsg} - code ${code}`);
 });
 
-logger.info("attempting to connect");
+logger.info(`[bot] handlers: ${handlers.map((h) => h.name).join(", ")}`);
+logger.info("[bot] attempting to connect");
 bot.connect();
 
-console.log("hello 2");
+// handle program shutdown
+process.stdin.resume();
 
-setTimeout(() => {
-  logger.verbose("later...");
-}, 10000);
+function exitHandler(code: any) {
+  logger.info(`[bot] shutdown requested, disconnecting - code: ${code}`);
+  try {
+    bot.disconnect();
+  } catch {}
+  process.exit();
+}
+
+process.on("exit", exitHandler.bind(null));
+process.on("SIGINT", exitHandler.bind(null));
+process.on("SIGUSR1", exitHandler.bind(null));
+process.on("SIGUSR2", exitHandler.bind(null));
+process.on("uncaughtException", exitHandler.bind(null));
