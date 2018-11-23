@@ -26,7 +26,7 @@ const asciiDogMessage = (chatBubbleMessage: string) =>
     "```"
   ].join("\n");
 
-const mymlan: IHandler = {
+export default {
   name: "mymlan",
   applicable: (message: string) => /!mymlan/.test(message),
   process: (bot, logger, { channelID, message }) => {
@@ -36,6 +36,4 @@ const mymlan: IHandler = {
       to: channelID
     });
   }
-};
-
-export default mymlan;
+} as IHandler;

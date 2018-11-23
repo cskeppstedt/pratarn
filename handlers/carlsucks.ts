@@ -1,6 +1,6 @@
 import { IHandler } from "./handler";
 
-const carlsucks: IHandler = {
+export default {
   name: "carlsucks",
   applicable: (message: string) => /!carlsucks/.test(message),
   process: (bot, logger, { channelID, message }) => {
@@ -9,6 +9,4 @@ const carlsucks: IHandler = {
       to: channelID
     });
   }
-};
-
-export default carlsucks;
+} as IHandler;

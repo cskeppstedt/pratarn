@@ -1,6 +1,6 @@
 import { IHandler } from "./handler";
 
-const prata: IHandler = {
+export default {
   name: "prata",
   applicable: (message: string) => /!prata .+/.test(message),
   process: (bot, logger, { channelID, message }) => {
@@ -18,6 +18,4 @@ const prata: IHandler = {
       }
     });
   }
-};
-
-export default prata;
+} as IHandler;
