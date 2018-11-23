@@ -1,6 +1,6 @@
 import Discord from "discord.io";
 import handlers from "./handlers";
-import logger from "./logger";
+import logger from "./utils/logger";
 
 require("dotenv").config();
 
@@ -28,19 +28,22 @@ bot.on(
     userID: string,
     channelID: string,
     message: string,
-    evt: object
+    evt: any
   ) => {
     logger.verbose(
-      `[bot] message event - user: ${user} - userID: ${userID} - channelID: ${channelID} - message: ${message}`
+      `[bot] message event - user: ${user} - userID: ${userID} - channelID: ${channelID} - message: ${message} - evt: ${JSON.stringify(
+        evt
+      )}`
     );
 
-    const applicableHandlers = handlers.filter((handler) =>
-      handler.applicable(message)
+    const channelMessage = { user, userID, channelID, message, evt };
+
+    const applicableHandlers = handlers.filter(handler =>
+      handler.applicable(channelMessage)
     );
 
     if (applicableHandlers.length > 0) {
-      const channelMessage = { user, userID, channelID, message, evt };
-      applicableHandlers.forEach((handler) => {
+      applicableHandlers.forEach(handler => {
         logger.verbose(`[bot] running handler: ${handler.name}`);
         handler.process(bot, logger, channelMessage);
       });
@@ -52,7 +55,7 @@ bot.on("disconnect", (errMsg, code) => {
   logger.info(`[bot] disconnected - error: ${errMsg} - code ${code}`);
 });
 
-logger.info(`[bot] handlers: ${handlers.map((h) => h.name).join(", ")}`);
+logger.info(`[bot] handlers: ${handlers.map(h => h.name).join(", ")}`);
 logger.info("[bot] attempting to connect");
 bot.connect();
 
