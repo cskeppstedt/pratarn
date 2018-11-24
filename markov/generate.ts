@@ -1,6 +1,6 @@
 import { IRandomInt } from "../utils/random_int";
 import { IMap } from "./build";
-import makePrefix, { fromKey } from "./make-prefix";
+import makePrefix, { fromKey, IPrefix } from "./make-prefix";
 import { normalizeWord } from "./tokenize";
 
 function maxInclusive(choices: string[]) {
@@ -49,6 +49,19 @@ function terminate(sentence: string) {
   return sentence;
 }
 
+const forceChoices = (map: IMap, prefix: IPrefix, randomInt: IRandomInt) => {
+  for (let attempts = 0; attempts < 5; attempts++) {
+    const choices = map.choicesFor(prefix);
+    if (choices.length > 0) {
+      return choices;
+    }
+
+    prefix = pickPrefix(randomInt, map);
+  }
+
+  return [];
+};
+
 export default (
   randomInt: IRandomInt,
   map: IMap,
@@ -62,7 +75,8 @@ export default (
   const words = [];
 
   for (let i = 0; i < numWords; i++) {
-    const choices = map.choicesFor(prefix);
+    // const choices = map.choicesFor(prefix);
+    const choices = forceChoices(map, prefix, randomInt);
 
     if (choices.length === 0) {
       break;

@@ -30,7 +30,8 @@ const makeResponse = async (logger: IPratarnLogger, username: string) => {
   }
 
   const corpus = makeMessageCorpus(messageObjects);
-  const numWords = 8 + randomInt(4);
+  const numWords = 8 + randomInt(5);
+  const numSentences = 4;
   const prefixLength = 2;
   const tokens = tokenize(corpus);
   const map = build(tokens, prefixLength);
@@ -38,14 +39,14 @@ const makeResponse = async (logger: IPratarnLogger, username: string) => {
   logger.verbose(
     `[prata] markov params for ${username} - ${
       messageObjects.length
-    } messages - ${numWords} words - ${prefixLength} prefix length - ${
+    } messages - ${numWords} words - ${numSentences} sentences - ${prefixLength} prefix length - ${
       tokens.length
     } tokens - ${map.keys().length} map keys - ${map.keys()}`
   );
 
   const generatedMessages = [`**${username}:**`];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < numSentences; i++) {
     generatedMessages.push(generate(randomInt, map, numWords, true));
   }
 

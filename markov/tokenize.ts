@@ -1,5 +1,5 @@
 const RE_DELIMITER = /\s/;
-const RE_PUNCTUATION = /['"\[\]().,_]/g;
+const RE_PUNCTUATION = /[?`´'"\[\]().,_]/g;
 
 const isValidWord = (word: string) => {
   if (word === null || word === undefined || word.trim() === "") {
