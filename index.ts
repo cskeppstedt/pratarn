@@ -1,4 +1,5 @@
 import Discord from "discord.io";
+import crawl_messages from "./crawl_messages";
 import handlers from "./handlers";
 import logger from "./utils/logger";
 import { parseMessageEvents } from "./utils/parse_log";
@@ -20,6 +21,9 @@ bot.on("ready", () => {
   logger.info(
     `[bot] connected - logged in as: ${bot.username} - id: ${bot.id}`
   );
+  // const ORDSKRIVING_CHANNEL_ID = "182952289122779136";
+  // const BEFORE = "515252472906907651";
+  // crawl_messages(bot, ORDSKRIVING_CHANNEL_ID, BEFORE);
 });
 
 bot.on(

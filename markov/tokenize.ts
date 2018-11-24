@@ -1,3 +1,14 @@
+const validWord = (word: string) => {
+  if (word === null || word === undefined || word.trim() === "") {
+    return false;
+  }
+
+  if (/https?:\/\//g.test(word)) {
+    return false;
+  }
+
+  return true;
+};
 export default (input: string) => {
   if (!input) {
     return [];
@@ -5,6 +16,6 @@ export default (input: string) => {
 
   return input
     .split(/\s/)
-    .filter((word) => !!word)
+    .filter(validWord)
     .map((word) => word.trim());
 };

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import { IMessageEvent } from "../handlers/handler";
+import { IMessageEvent } from "../types";
 
 const RE_EVT = /^{"message":"\[bot\] message event - .* - evt: (.*)","level":"verbose"}$/;
 const RE_ESCAPED_QUOTES = /\\"/g;

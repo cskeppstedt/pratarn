@@ -1,5 +1,5 @@
+import { IHandler } from "../types";
 import repeat from "../utils/repeat";
-import { IHandler } from "./handler";
 
 const asciiChatBubble = (chatBubbleMessage: string) =>
   [
@@ -32,8 +32,9 @@ export default {
   applicable: (bot, logger, channelMessage) =>
     /!mymlan/.test(channelMessage.message),
 
-  process: (bot, logger, { channelID, message }) => {
+  process: (bot, logger, { channelID, message, evt }) => {
     const chatBubbleMessage = message.substring("!mymlan ".length);
+    logger.verbose(`[mymlan] responding to message ${evt.d.id} `);
     bot.sendMessage({
       message: asciiDogMessage(chatBubbleMessage),
       to: channelID
