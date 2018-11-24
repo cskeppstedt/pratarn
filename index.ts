@@ -22,7 +22,7 @@ bot.on("ready", () => {
     `[bot] connected - logged in as: ${bot.username} - id: ${bot.id}`
   );
   // const ORDSKRIVING_CHANNEL_ID = "182952289122779136";
-  // const BEFORE = "515252472906907651";
+  // const BEFORE = undefined;
   // crawl_messages(bot, ORDSKRIVING_CHANNEL_ID, BEFORE);
 });
 

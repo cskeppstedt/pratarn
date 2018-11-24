@@ -46,7 +46,11 @@ const batchMessages = (messages: IStorageMessageView[]) => {
 };
 
 const nextBefore = (messages: IMessageObject[]) => {
-  return messages[messages.length - 1].id;
+  return messages.reduce(
+    (minMessage, message) =>
+      message.timestamp < minMessage.timestamp ? message : minMessage,
+    messages[0]
+  ).id;
 };
 
 export default async (
