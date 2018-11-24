@@ -8,8 +8,7 @@ const fileTransport = new transports.File({
   dirname: "logs",
   filename: "pratarn.log",
   maxFiles: 7,
-  maxsize: 1024 * 1024 * 30,
-  zippedArchive: true
+  maxsize: 1024 * 1024 * 30
 });
 
 export default createLogger({

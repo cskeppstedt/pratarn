@@ -28,7 +28,10 @@ const asciiDogMessage = (chatBubbleMessage: string) =>
 
 export default {
   name: "mymlan",
-  applicable: channelMessage => /!mymlan/.test(channelMessage.message),
+
+  applicable: (bot, logger, channelMessage) =>
+    /!mymlan/.test(channelMessage.message),
+
   process: (bot, logger, { channelID, message }) => {
     const chatBubbleMessage = message.substring("!mymlan ".length);
     bot.sendMessage({
