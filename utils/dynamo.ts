@@ -4,6 +4,7 @@ import {
   IStorageMessageView,
   NormalizedUsername
 } from "../types";
+import MemoryCache from "./memory_cache";
 
 require("dotenv").config();
 
@@ -12,6 +13,8 @@ AWS.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_DEFAULT_REGION
 });
+
+const messagesCache = new MemoryCache(60 * 5); // 5 min cache
 
 const TABLE_NAME = "PratarnMessagesObjectsTest";
 
@@ -49,4 +52,12 @@ export const fetchMessageObjects = async (username: NormalizedUsername) => {
     count: response.Count as number,
     messageObjects: response.Items as IStorageMessageView[]
   } as IFetchMessageObjectsResponse;
+};
+
+export const fetchMessageObjectsCached = async (
+  username: NormalizedUsername
+) => {
+  return messagesCache.get(username, () =>
+    fetchMessageObjects(username)
+  ) as Promise<IFetchMessageObjectsResponse>;
 };

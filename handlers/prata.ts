@@ -8,7 +8,10 @@ import {
   IPratarnLogger,
   IStorageMessageView
 } from "../types";
-import { fetchMessageObjects, insertMessageObject } from "../utils/dynamo";
+import {
+  fetchMessageObjectsCached,
+  insertMessageObject
+} from "../utils/dynamo";
 import normalizeUsername from "../utils/normalize_username";
 import randomInt from "../utils/random_int";
 import shouldRecordMessage from "../utils/should_record_message";
@@ -21,7 +24,7 @@ const makeMessageCorpus = (messages: IStorageMessageView[]) =>
   messages.map((message) => message.content).join("\n");
 
 const makeResponse = async (logger: IPratarnLogger, username: string) => {
-  const { messageObjects } = await fetchMessageObjects(
+  const { messageObjects } = await fetchMessageObjectsCached(
     normalizeUsername(username)
   );
 
