@@ -57,16 +57,17 @@ const respond: IHandlerProcess = async (
   logger,
   { channelID, message, evt }
 ) => {
-  const targetUserName = message.substring("!prata ".length);
-  logger.verbose(
-    `[prata] responding to message ${evt.d.id} for username ${targetUserName}`
-  );
-
-  const responseMessage = await makeResponse(logger, targetUserName);
-  bot.sendMessage({
-    message: responseMessage,
-    to: channelID
-  });
+  try {
+    const targetUserName = message.substring("!prata ".length);
+    const responseMessage = await makeResponse(logger, targetUserName);
+    logger.verbose(
+      `[prata] responding to message ${evt.d.id} for username ${targetUserName}`
+    );
+    bot.sendMessage({ message: responseMessage, to: channelID });
+  } catch (err) {
+    logger.error(`[prata] error occurred, possible throttling - ${err}`);
+    console.error(err);
+  }
 };
 
 const recordMessage: IHandlerProcess = (bot, logger, channelMessage) => {
