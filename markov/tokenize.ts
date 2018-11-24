@@ -1,4 +1,7 @@
-const validWord = (word: string) => {
+const RE_DELIMITER = /\s/;
+const RE_PUNCTUATION = /['"\[\]().,_]/g;
+
+const isValidWord = (word: string) => {
   if (word === null || word === undefined || word.trim() === "") {
     return false;
   }
@@ -7,15 +10,27 @@ const validWord = (word: string) => {
     return false;
   }
 
+  if (/```/g.test(word)) {
+    return false;
+  }
+
   return true;
 };
+
+export const normalizeWord = (word: string) => {
+  return (word || "")
+    .trim()
+    .toLowerCase()
+    .replace(RE_PUNCTUATION, "");
+};
+
 export default (input: string) => {
-  if (!input) {
+  if (input === null || input === undefined || input.trim() === "") {
     return [];
   }
 
   return input
     .split(/\s/)
-    .filter(validWord)
-    .map((word) => word.trim());
+    .filter(isValidWord)
+    .map(normalizeWord);
 };

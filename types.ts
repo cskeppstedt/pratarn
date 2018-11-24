@@ -1,6 +1,8 @@
 import Discord from "discord.io";
 import winston from "winston";
 
+export type IPratarnLogger = winston.Logger;
+
 export interface IStorageMessageView {
   author_id: snowflake;
   author_username: NormalizedUsername;

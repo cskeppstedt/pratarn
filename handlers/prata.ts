@@ -5,6 +5,7 @@ import {
   IChannelMessage,
   IHandler,
   IHandlerProcess,
+  IPratarnLogger,
   IStorageMessageView
 } from "../types";
 import { fetchMessageObjects, insertMessageObject } from "../utils/dynamo";
@@ -19,7 +20,7 @@ const shouldRespond = (channelMessage: IChannelMessage) =>
 const makeMessageCorpus = (messages: IStorageMessageView[]) =>
   messages.map((message) => message.content).join("\n");
 
-const makeResponse = async (username: string) => {
+const makeResponse = async (logger: IPratarnLogger, username: string) => {
   const { messageObjects } = await fetchMessageObjects(
     normalizeUsername(username)
   );
@@ -33,6 +34,14 @@ const makeResponse = async (username: string) => {
   const prefixLength = 2;
   const tokens = tokenize(corpus);
   const map = build(tokens, prefixLength);
+
+  logger.verbose(
+    `[prata] markov params for ${username} - ${
+      messageObjects.length
+    } messages - ${numWords} words - ${prefixLength} prefix length - ${
+      tokens.length
+    } tokens - ${map.keys().length} map keys - ${map.keys()}`
+  );
 
   const generatedMessages = [`**${username}:**`];
 
@@ -53,7 +62,7 @@ const respond: IHandlerProcess = async (
     `[prata] responding to message ${evt.d.id} for username ${targetUserName}`
   );
 
-  const responseMessage = await makeResponse(targetUserName);
+  const responseMessage = await makeResponse(logger, targetUserName);
   bot.sendMessage({
     message: responseMessage,
     to: channelID

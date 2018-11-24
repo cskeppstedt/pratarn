@@ -1,6 +1,7 @@
 import { IRandomInt } from "../utils/random_int";
 import { IMap } from "./build";
 import makePrefix, { fromKey } from "./make-prefix";
+import { normalizeWord } from "./tokenize";
 
 function maxInclusive(choices: string[]) {
   return choices.length - 1;
@@ -73,7 +74,8 @@ export default (
     if (words.length === 0) {
       words.push(word);
     } else {
-      words.push(normalize(word));
+      // words.push(normalize(word));
+      words.push(normalizeWord(word));
     }
 
     if (/\.$/.test(word)) {
