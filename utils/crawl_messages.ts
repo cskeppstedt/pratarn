@@ -1,10 +1,10 @@
 import Discord from "discord.io";
-import { IMessageObject, IStorageMessageView, snowflake } from "./types";
-import chunk from "./utils/chunk";
-import { insertMessageObjects } from "./utils/dynamo";
-import logger from "./utils/logger";
-import shouldRecordMessage from "./utils/should_record_message";
-import toStorageMessageView from "./utils/to_storage_message_view";
+import { IMessageObject, IStorageMessageView, snowflake } from "../types";
+import chunk from "./chunk";
+import { insertMessageObjects } from "./dynamo";
+import logger from "./logger";
+import shouldRecordMessage from "./should_record_message";
+import toStorageMessageView from "./to_storage_message_view";
 
 const fetchMessages = (
   bot: Discord.Client,
