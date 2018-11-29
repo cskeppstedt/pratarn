@@ -42,7 +42,7 @@ bot.on(
 
     if (applicableHandlers.length > 0) {
       applicableHandlers.forEach((handler) => {
-        logger.verbose(`[bot] running handler: ${handler.name}`);
+        logger.verbose(`[bot] running handler: ${handler.command}`);
         handler.process(bot, logger, channelMessage);
       });
     }
@@ -53,7 +53,7 @@ bot.on("disconnect", (errMsg, code) => {
   logger.info(`[bot] disconnected - error: ${errMsg} - code ${code}`);
 });
 
-logger.info(`[bot] handlers: ${handlers.map((h) => h.name).join(", ")}`);
+logger.info(`[bot] handlers: ${handlers.map((h) => h.command).join(", ")}`);
 logger.info("[bot] attempting to connect");
 bot.connect();
 

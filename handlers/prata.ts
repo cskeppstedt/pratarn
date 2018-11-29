@@ -83,7 +83,7 @@ const recordMessage: IHandlerProcess = (bot, logger, channelMessage) => {
 };
 
 export default {
-  name: "prata",
+  command: "!prata",
   description:
     "generate markov chain text for a username, e.g.: !prata skepparn",
 

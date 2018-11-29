@@ -3,7 +3,7 @@ import { randomGalleryImage } from "../utils/imgur";
 import isBot from "../utils/is_bot";
 
 export default {
-  name: "dank",
+  command: "!dank",
   description: "links a random r/dankmemes image from this month",
 
   applicable: (bot, logger, channelMessage) =>

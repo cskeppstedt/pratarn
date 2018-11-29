@@ -3,13 +3,14 @@ import { randomGalleryImage } from "../utils/imgur";
 import isBot from "../utils/is_bot";
 
 const describeCommands = (handlers: IHandler[]) =>
+  "\n\n" +
   handlers
-    .map(({ name, description }) => `**${name}**\n${description}`)
+    .map(({ command, description }) => `**${command}**\n${description}`)
     .join("\n\n");
 
 export default (handlers: IHandler[]) =>
   ({
-    name: "help",
+    command: "!help",
     description: "displays a list of commands and their description",
 
     applicable: (bot, logger, channelMessage) =>

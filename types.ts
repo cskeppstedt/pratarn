@@ -147,7 +147,7 @@ export type IHandlerProcess = (
 
 export interface IHandler {
   applicable: IHandlerApplicable;
-  name: string;
+  command: string;
   description: string;
   process: IHandlerProcess;
 }

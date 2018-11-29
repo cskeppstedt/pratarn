@@ -1,7 +1,7 @@
 import { IHandler } from "../types";
 
 export default {
-  name: "carlsucks",
+  command: "!carlsucks",
   description: "the core functionality that shall never be removed",
 
   applicable: (bot, logger, channelMessage) =>
