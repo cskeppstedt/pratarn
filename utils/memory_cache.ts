@@ -16,7 +16,7 @@ class MemoryCache {
   }
 
   public get<T>(key: CacheKey, storeFunction: IStoreFunction<T>) {
-    const value = this.cache.get(key);
+    const value = this.cache.get(key) as T;
     if (value) {
       logger.verbose(`[MemoryCache] cache found for ${key}`);
       return Promise.resolve(value);

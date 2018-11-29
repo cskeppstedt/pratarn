@@ -1,5 +1,4 @@
 import Discord from "discord.io";
-import crawl_messages from "./crawl_messages";
 import handlers from "./handlers";
 import logger from "./utils/logger";
 import { parseMessageEvents } from "./utils/parse_log";
@@ -13,17 +12,12 @@ if (!discordAuthToken) {
   process.exit(1);
 }
 
-const bot = new Discord.Client({
-  token: discordAuthToken
-});
+const bot = new Discord.Client({ token: discordAuthToken });
 
 bot.on("ready", () => {
   logger.info(
     `[bot] connected - logged in as: ${bot.username} - id: ${bot.id}`
   );
-  // const ORDSKRIVING_CHANNEL_ID = "182952289122779136";
-  // const BEFORE = undefined;
-  // crawl_messages(bot, ORDSKRIVING_CHANNEL_ID, BEFORE);
 });
 
 bot.on(

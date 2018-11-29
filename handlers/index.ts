@@ -1,5 +1,6 @@
 import carlsucks from "./carlsucks";
+import dank from "./dank";
 import mymlan from "./mymlan";
 import prata from "./prata";
 
-export default [prata, carlsucks, mymlan];
+export default [dank, prata, carlsucks, mymlan];
