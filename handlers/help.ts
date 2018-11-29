@@ -3,7 +3,7 @@ import { randomGalleryImage } from "../utils/imgur";
 import isBot from "../utils/is_bot";
 
 const describeCommands = (handlers: IHandler[]) =>
-  "\n\n" +
+  "Available commands:\n\n" +
   handlers
     .map(({ command, description }) => `**${command}**\n${description}`)
     .join("\n\n");
