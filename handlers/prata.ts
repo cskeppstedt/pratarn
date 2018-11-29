@@ -1,3 +1,4 @@
+import { isBoolean } from "util";
 import build from "../markov/build";
 import generate from "../markov/generate";
 import tokenize from "../markov/tokenize";
@@ -12,6 +13,7 @@ import {
   fetchMessageObjectsCached,
   insertMessageObject
 } from "../utils/dynamo";
+import isBot from "../utils/is_bot";
 import normalizeUsername from "../utils/normalize_username";
 import randomInt from "../utils/random_int";
 import shouldRecordMessage from "../utils/should_record_message";
@@ -84,7 +86,9 @@ export default {
   name: "prata",
 
   applicable: (bot, logger, channelMessage) =>
-    shouldRespond(channelMessage) || shouldRecordMessage(channelMessage.evt.d),
+    (shouldRespond(channelMessage) ||
+      shouldRecordMessage(channelMessage.evt.d)) &&
+    !isBot(channelMessage),
 
   process: (bot, logger, channelMessage) => {
     if (shouldRespond(channelMessage)) {

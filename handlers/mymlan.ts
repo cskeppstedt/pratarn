@@ -1,4 +1,5 @@
 import { IHandler } from "../types";
+import isBot from "../utils/is_bot";
 import repeat from "../utils/repeat";
 
 const asciiChatBubble = (chatBubbleMessage: string) =>
@@ -30,7 +31,7 @@ export default {
   name: "mymlan",
 
   applicable: (bot, logger, channelMessage) =>
-    /!mymlan/.test(channelMessage.message),
+    /!mymlan/.test(channelMessage.message) && !isBot(channelMessage),
 
   process: (bot, logger, { channelID, message, evt }) => {
     const chatBubbleMessage = message.substring("!mymlan ".length);
