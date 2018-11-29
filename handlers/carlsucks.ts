@@ -2,6 +2,7 @@ import { IHandler } from "../types";
 
 export default {
   name: "carlsucks",
+  description: "the core functionality that shall never be removed",
 
   applicable: (bot, logger, channelMessage) =>
     /!carlsucks/.test(channelMessage.message),

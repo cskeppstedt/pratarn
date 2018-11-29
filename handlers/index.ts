@@ -1,6 +1,9 @@
 import carlsucks from "./carlsucks";
 import dank from "./dank";
+import help from "./help";
 import mymlan from "./mymlan";
 import prata from "./prata";
 
-export default [dank, prata, carlsucks, mymlan];
+const handlers = [dank, prata, carlsucks, mymlan];
+
+export default [...handlers, help(handlers)];

@@ -4,6 +4,7 @@ import isBot from "../utils/is_bot";
 
 export default {
   name: "dank",
+  description: "links a random r/dankmemes image from this month",
 
   applicable: (bot, logger, channelMessage) =>
     /!dank/.test(channelMessage.message) && !isBot(channelMessage),

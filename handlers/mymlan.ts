@@ -29,6 +29,7 @@ const asciiDogMessage = (chatBubbleMessage: string) =>
 
 export default {
   name: "mymlan",
+  description: "shows the inner thoughts of the mymmel",
 
   applicable: (bot, logger, channelMessage) =>
     /!mymlan/.test(channelMessage.message) && !isBot(channelMessage),
