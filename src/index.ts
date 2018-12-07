@@ -77,7 +77,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(80);
+server.listen(8080);
 bot.connect();
 
 // handle program shutdown
