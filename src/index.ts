@@ -1,4 +1,5 @@
 import Discord from "discord.io";
+import http from "http";
 import handlers from "./handlers";
 import logger from "./utils/logger";
 import { parseMessageEvents } from "./utils/parse_log";
@@ -55,6 +56,28 @@ bot.on("disconnect", (errMsg, code) => {
 
 logger.info(`[bot] handlers: ${handlers.map((h) => h.command).join(", ")}`);
 logger.info("[bot] attempting to connect");
+
+const server = http.createServer((req, res) => {
+  if (bot.connected) {
+    const body = "Bot connected\n";
+    const contentLength = body.length;
+    res.writeHead(200, {
+      "Content-Length": contentLength,
+      "Content-Type": "text/plain"
+    });
+    res.end(body);
+  } else {
+    const body = "Bot not connected\n";
+    const contentLength = body.length;
+    res.writeHead(500, {
+      "Content-Length": contentLength,
+      "Content-Type": "text/plain"
+    });
+    res.end(body);
+  }
+});
+
+server.listen(80);
 bot.connect();
 
 // handle program shutdown
