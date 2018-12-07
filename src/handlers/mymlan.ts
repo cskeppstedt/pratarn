@@ -32,11 +32,11 @@ export default {
   description: "shows the inner thoughts of the mymmel",
 
   applicable: (bot, logger, channelMessage) =>
-    /!mymlan/.test(channelMessage.message) && !isBot(channelMessage),
+    /^!mymlan/i.test(channelMessage.message) && !isBot(channelMessage),
 
   process: (bot, logger, { channelID, message, evt }) => {
     const chatBubbleMessage = message.substring("!mymlan ".length);
-    logger.verbose(`[mymlan] responding to message ${evt.d.id} `);
+    logger.info(`[mymlan] responding to message ${evt.d.id} `);
     bot.sendMessage({
       message: asciiDogMessage(chatBubbleMessage),
       to: channelID

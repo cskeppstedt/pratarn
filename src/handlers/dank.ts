@@ -7,10 +7,10 @@ export default {
   description: "links a random r/dankmemes image from this month",
 
   applicable: (bot, logger, channelMessage) =>
-    /!dank/.test(channelMessage.message) && !isBot(channelMessage),
+    /^!dank/i.test(channelMessage.message) && !isBot(channelMessage),
 
   process: async (bot, logger, { channelID, message, evt }) => {
-    logger.verbose(`[dank] responding to message ${evt.d.id} `);
+    logger.info(`[dank] responding to message ${evt.d.id} `);
     const image = await randomGalleryImage({ subreddit: "dankmemes" });
     bot.sendMessage({ message: image.link, to: channelID });
   }

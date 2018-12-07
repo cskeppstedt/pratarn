@@ -17,10 +17,12 @@ import isBot from "../utils/is_bot";
 import normalizeUsername from "../utils/normalize_username";
 import randomInt from "../utils/random_int";
 import shouldRecordMessage from "../utils/should_record_message";
-import toStorageMessageView from "../utils/to_storage_message_view";
+import toStorageMessageView, {
+  getAuthorUsername
+} from "../utils/to_storage_message_view";
 
 const shouldRespond = (channelMessage: IChannelMessage) =>
-  /^!prata .+/.test(channelMessage.message);
+  /^!prata/i.test(channelMessage.message);
 
 const makeMessageCorpus = (messages: IStorageMessageView[]) =>
   messages.map((message) => message.content).join("\n");
@@ -64,9 +66,10 @@ const respond: IHandlerProcess = async (
   { channelID, message, evt }
 ) => {
   try {
-    const targetUserName = message.substring("!prata ".length);
+    const targetUserName =
+      message.substring("!prata ".length) || getAuthorUsername(evt.d);
     const responseMessage = await makeResponse(logger, targetUserName);
-    logger.verbose(
+    logger.info(
       `[prata] responding to message ${evt.d.id} for username ${targetUserName}`
     );
     bot.sendMessage({ message: responseMessage, to: channelID });
