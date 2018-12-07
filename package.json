@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node ./build/index.js",
-    "live": "npm run build:live",
-    "dynamo": "nodemon --exec ./node_modules/.bin/ts-node -- ./dynamo.ts",
-    "build": "tsc",
-    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./index.ts"
+    "build": "./node_modules/.bin/tsc",
+    "live": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts"
   },
   "dependencies": {
     "aws-sdk": "^2.361.0",
