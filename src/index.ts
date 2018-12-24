@@ -52,6 +52,12 @@ bot.on(
 
 bot.on("disconnect", (errMsg, code) => {
   logger.info(`[bot] disconnected - error: ${errMsg} - code ${code}`);
+  bot.connected = false; // doesn't seem to be reset by the lib
+
+  setTimeout(() => {
+    logger.info("[bot] attempting reconnect");
+    bot.connect();
+  }, 3000);
 });
 
 logger.info(`[bot] handlers: ${handlers.map((h) => h.command).join(", ")}`);
