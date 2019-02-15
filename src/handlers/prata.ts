@@ -1,3 +1,4 @@
+import { bool } from "aws-sdk/clients/signer";
 import { isBoolean } from "util";
 import build from "../markov/build";
 import generate from "../markov/generate";
@@ -21,13 +22,19 @@ import toStorageMessageView, {
   getAuthorUsername
 } from "../utils/to_storage_message_view";
 
+const getShowStats = (message: string) => message.includes("--stats");
+
 const shouldRespond = (channelMessage: IChannelMessage) =>
   /^!prata/i.test(channelMessage.message);
 
 const makeMessageCorpus = (messages: IStorageMessageView[]) =>
   messages.map((message) => message.content).join("\n");
 
-const makeResponse = async (logger: IPratarnLogger, username: string) => {
+const makeResponse = async (
+  logger: IPratarnLogger,
+  username: string,
+  showStats: bool
+) => {
   const { messageObjects } = await fetchMessageObjectsCached(
     normalizeUsername(username)
   );
@@ -43,15 +50,18 @@ const makeResponse = async (logger: IPratarnLogger, username: string) => {
   const tokens = tokenize(corpus);
   const map = build(tokens, prefixLength);
 
-  logger.verbose(
-    `[prata] markov params for ${username} - ${
-      messageObjects.length
-    } messages - ${numWords} words - ${numSentences} sentences - ${prefixLength} prefix length - ${
-      tokens.length
-    } tokens - ${map.keys().length} map keys - ${map.keys()}`
-  );
+  const stats = `[ markov params for ${username} - ${
+    messageObjects.length
+  } messages - ${numWords} words - ${numSentences} sentences - ${prefixLength} prefix length - ${
+    tokens.length
+  } tokens - ${map.keys().length} map keys - ${map.keys()} ]`;
+
+  logger.verbose(`[prata] ${stats}`);
 
   const generatedMessages = [`**${username}:**`];
+  if (showStats) {
+    generatedMessages.push(stats);
+  }
 
   for (let i = 0; i < numSentences; i++) {
     generatedMessages.push(generate(randomInt, map, numWords, true));
@@ -68,7 +78,12 @@ const respond: IHandlerProcess = async (
   try {
     const targetUserName =
       message.substring("!prata ".length) || getAuthorUsername(evt.d);
-    const responseMessage = await makeResponse(logger, targetUserName);
+    const showStats = getShowStats(message);
+    const responseMessage = await makeResponse(
+      logger,
+      targetUserName,
+      showStats
+    );
     logger.info(
       `[prata] responding to message ${evt.d.id} for username ${targetUserName}`
     );
