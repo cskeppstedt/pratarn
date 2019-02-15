@@ -75,8 +75,8 @@ export default (
   const words = [];
 
   for (let i = 0; i < numWords; i++) {
-    // const choices = map.choicesFor(prefix);
-    const choices = forceChoices(map, prefix, randomInt);
+    const choices = map.choicesFor(prefix);
+    // const choices = forceChoices(map, prefix, randomInt);
 
     if (choices.length === 0) {
       break;
