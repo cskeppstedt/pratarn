@@ -22,6 +22,12 @@ import toStorageMessageView, {
   getAuthorUsername
 } from "../utils/to_storage_message_view";
 
+const getUsernameFromMessage = (message: string) =>
+  message
+    .replace(/(--\w+)/g, "")
+    .substr("!prata".length)
+    .trim();
+
 const getShowStats = (message: string) => message.includes("--stats");
 
 const shouldRespond = (channelMessage: IChannelMessage) =>
@@ -77,7 +83,7 @@ const respond: IHandlerProcess = async (
 ) => {
   try {
     const targetUserName =
-      message.substring("!prata ".length) || getAuthorUsername(evt.d);
+      getUsernameFromMessage(message) || getAuthorUsername(evt.d);
     const showStats = getShowStats(message);
     const responseMessage = await makeResponse(
       logger,
