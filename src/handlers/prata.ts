@@ -45,7 +45,6 @@ const makeResponse = async (
     return `sry känner inte igen **${username}** :(  testa annat username?`;
   }
 
-  // const corpus = makeMessageCorpus(messageObjects);
   const paragraphs = makeParagraphs(messageObjects);
   const numWords = 8 + randomInt(5);
   const numSentences = 4;
