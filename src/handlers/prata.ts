@@ -53,11 +53,12 @@ const makeResponse = async (
   const tokenizedSentences = tokenizeParagraphs(paragraphs);
   const map = buildMap(tokenizedSentences, prefixLength);
 
-  const stats = `[ markov params for ${username} - ${
-    messageObjects.length
-  } messages - ${numWords} words - ${numSentences} sentences - ${
-    Object.keys(map).length
-  } map keys`;
+  const stats = `[ ${[
+    `markov params for ${username}`,
+    `${messageObjects.length} messages`,
+    `${Object.keys(map).length} map keys`,
+    `target: ${numSentences} sentences, ${numWords} words, prefix length ${prefixLength}`,
+  ].join(' - ')} ]`
 
   logger.verbose(`[prata] ${stats}`);
 
