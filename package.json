@@ -16,7 +16,7 @@
     "dotenv": "^7.0.0",
     "isomorphic-fetch": "2.2.1",
     "node-cache": "4.2.0",
-    "oh-hi-markov": "0.1.0",
+    "oh-hi-markov": "^0.3.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
