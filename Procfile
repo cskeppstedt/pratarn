@@ -1,2 +1,2 @@
 release: npm run build
-worker: ./build/index.js
+worker: node ./build/index.js
