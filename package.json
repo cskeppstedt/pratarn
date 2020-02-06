@@ -11,13 +11,14 @@
     "live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts"
   },
   "dependencies": {
-    "@discordjs/uws": "^11.149.1",
     "aws-sdk": "^2.613.0",
+    "bufferutil": "^4.0.1",
     "discord.js": "^11.5.1",
     "dotenv": "^8.2.0",
     "isomorphic-fetch": "2.2.1",
     "node-cache": "5.1.0",
     "oh-hi-markov": "^0.3.0",
+    "utf-8-validate": "^5.0.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
