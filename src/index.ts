@@ -48,6 +48,7 @@ bot.on('disconnect', (evt: any) => {
   }, 3000);
 });
 
+logger.info(`[bot] working dir: ${process.cwd()}`);
 logger.info(`[bot] handlers: ${handlers.map((h) => h.command).join(', ')}`);
 logger.info('[bot] attempting to connect');
 

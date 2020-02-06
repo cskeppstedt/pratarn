@@ -1,8 +1,6 @@
 import Discord from 'discord.js';
 import winston from 'winston';
 
-// import Discord from "discord.io";
-
 export type IPratarnLogger = winston.Logger;
 
 export interface IStorageMessageView {
