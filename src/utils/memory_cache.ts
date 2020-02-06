@@ -1,5 +1,5 @@
-import NodeCache from "node-cache";
-import logger from "./logger";
+import NodeCache from 'node-cache';
+import logger from './logger';
 
 export type IStoreFunction<T> = () => Promise<T>;
 export type CacheKey = string | number;
@@ -11,7 +11,7 @@ class MemoryCache {
     this.cache = new NodeCache({
       stdTTL: ttlSeconds,
       checkperiod: ttlSeconds * 0.2,
-      useClones: false
+      useClones: false,
     });
   }
 

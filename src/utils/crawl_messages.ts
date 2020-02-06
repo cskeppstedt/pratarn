@@ -1,68 +1,62 @@
-import Discord from "discord.io";
-import { IMessageObject, IStorageMessageView, snowflake } from "../types";
-import chunk from "./chunk";
-import { insertMessageObjects } from "./dynamo";
-import logger from "./logger";
-import shouldRecordMessage from "./should_record_message";
-import toStorageMessageView from "./to_storage_message_view";
+/* eslint-disable no-await-in-loop */
+// import Discord from "discord.io";
+import chunk from './chunk';
+import { insertMessageObjects } from './dynamo';
+import logger from './logger';
+import shouldRecordMessage from './should_record_message';
+import toStorageMessageView from './to_storage_message_view';
 
 const fetchMessages = (
   bot: Discord.Client,
   channelId: snowflake,
-  before?: snowflake
-) => {
-  return new Promise((resolve, reject) => {
-    bot.getMessages(
-      { before, channelID: channelId, limit: 100 },
-      (err, response) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(response);
-        }
+  before?: snowflake,
+) => new Promise((resolve, reject) => {
+  bot.getMessages(
+    { before, channelID: channelId, limit: 100 },
+    (err, response) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(response);
       }
-    );
-  }) as Promise<IMessageObject[]>;
-};
+    },
+  );
+}) as Promise<IMessageObject[]>;
 
 const insertBatch = async (
   messages: IStorageMessageView[],
-  batchId: number
+  batchId: number,
 ) => {
   logger.info(`[crawl] inserting batch ${batchId} - ${messages.length} items`);
   try {
-    const result = await insertMessageObjects(messages);
+    await insertMessageObjects(messages);
     logger.info(`[crawl] batch ${batchId} successful`);
   } catch (err) {
     logger.error(`[crawl] batch ${batchId} failed`);
-    console.info("messages in batch:");
+    console.info('messages in batch:');
     console.info(messages);
     throw err;
   }
 };
 
-const batchMessages = (messages: IStorageMessageView[]) => {
-  return chunk(messages, 25);
-};
+const batchMessages = (messages: IStorageMessageView[]) => chunk(messages, 25);
 
-const nextBefore = (messages: IMessageObject[]) => {
-  return messages.reduce(
-    (minMessage, message) =>
-      message.timestamp < minMessage.timestamp ? message : minMessage,
-    messages[0]
-  ).id;
-};
+const nextBefore = (messages: IMessageObject[]) => messages.reduce(
+  (minMessage, message) => (message.timestamp < minMessage.timestamp ? message : minMessage),
+  messages[0],
+).id;
 
 export default async (
   bot: Discord.Client,
   channelId: snowflake,
-  before?: snowflake
+  before?: snowflake,
 ) => {
-  logger.info("[crawl] starting");
+  logger.info('[crawl] starting');
 
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     logger.info(
-      `[crawl] fetching messages in channel ${channelId} before: ${before}`
+      `[crawl] fetching messages in channel ${channelId} before: ${before}`,
     );
     const messages = await fetchMessages(bot, channelId, before);
     logger.info(`[crawl] fetch successful, ${messages.length} items`);
@@ -75,19 +69,18 @@ export default async (
       if (filteredMessages.length) {
         const batches = batchMessages(filteredMessages);
         logger.info(
-          `[crawl] inserting ${batches.length} batches - ${
-            filteredMessages.length
-          } messages`
+          `[crawl] inserting ${batches.length} batches - ${filteredMessages.length} messages`,
         );
         await Promise.all(batches.map(insertBatch));
       } else {
-        logger.info("[crawl] no filtered items, skipping insert");
+        logger.info('[crawl] no filtered items, skipping insert');
       }
 
+      // eslint-disable-next-line no-param-reassign
       before = nextBefore(messages);
       logger.info(`[crawl] nextBefore: ${before}`);
     } else {
-      logger.info("[crawl] no more messages, stopping");
+      logger.info('[crawl] no more messages, stopping');
       return;
     }
   }

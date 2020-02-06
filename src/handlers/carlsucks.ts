@@ -1,15 +1,14 @@
-import { IHandler } from "../types";
-import isBot from "../utils/is_bot";
+import { IHandler } from '../types';
+import isBot from '../utils/is_bot';
 
 export default {
-  command: "!carlsucks",
-  description: "the core functionality that shall never be removed",
+  command: '!carlsucks',
+  description: 'the core functionality that shall never be removed',
 
-  applicable: (bot, logger, channelMessage) =>
-    /^!carlsucks/i.test(channelMessage.message) && !isBot(channelMessage),
+  applicable: (bot, logger, channelMessage) => /^!carlsucks/i.test(channelMessage.message) && !isBot(channelMessage),
 
   process: (bot, logger, { channelID, evt }) => {
     logger.info(`[carlsucks] responding to message ${evt.d.id}`);
-    bot.sendMessage({ message: "HEJ på dig din jävel!", to: channelID });
-  }
+    bot.sendMessage({ message: 'HEJ på dig din jävel!', to: channelID });
+  },
 } as IHandler;

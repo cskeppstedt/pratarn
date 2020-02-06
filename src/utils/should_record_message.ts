@@ -1,4 +1,4 @@
-import { IChannelMessage, IMessageObject } from "../types";
+import { IMessageObject } from '../types';
 
 export default (messageObject: IMessageObject) => {
   if (/^!/.test(messageObject.content)) {
@@ -14,9 +14,9 @@ export default (messageObject: IMessageObject) => {
   }
 
   if (
-    messageObject.content === null ||
-    messageObject.content === undefined ||
-    messageObject.content === ""
+    messageObject.content === null
+    || messageObject.content === undefined
+    || messageObject.content === ''
   ) {
     return false;
   }
