@@ -1,5 +1,5 @@
-import { IChannelMessage } from '../types';
+import Discord from 'discord.js';
 
-const isBot = (channelMessage: IChannelMessage) => channelMessage.evt.d.author.bot === true;
+const isBot = (message: Discord.Message) => message.author.bot;
 
 export default isBot;

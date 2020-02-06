@@ -29,14 +29,11 @@ export default {
   command: '!mymlan',
   description: 'shows the inner thoughts of the mymmel',
 
-  applicable: (bot, logger, channelMessage) => /^!mymlan/i.test(channelMessage.message) && !isBot(channelMessage),
+  applicable: (bot, logger, message) => /^!mymlan/i.test(message.content) && !isBot(message),
 
-  process: (bot, logger, { channelID, message, evt }) => {
-    const chatBubbleMessage = message.substring('!mymlan '.length);
-    logger.info(`[mymlan] responding to message ${evt.d.id} `);
-    bot.sendMessage({
-      message: asciiDogMessage(chatBubbleMessage),
-      to: channelID,
-    });
+  process: (bot, logger, message) => {
+    const chatBubbleMessage = message.content.substring('!mymlan '.length);
+    logger.info(`[mymlan] responding to message ${message.id} `);
+    message.reply(asciiDogMessage(chatBubbleMessage));
   },
 } as IHandler;

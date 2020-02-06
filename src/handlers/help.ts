@@ -9,15 +9,12 @@ export default (handlers: IHandler[]) => ({
   command: '!help',
   description: 'displays a list of commands and their description',
 
-  applicable: (bot, logger, channelMessage) => (/^!help/i.test(channelMessage.message)
-        || /^!pratarn/i.test(channelMessage.message))
-      && !isBot(channelMessage),
+  applicable: (bot, logger, message) => (/^!help/i.test(message.content)
+        || /^!pratarn/i.test(message.content))
+      && !isBot(message),
 
-  process: async (bot, logger, { channelID, evt }) => {
-    logger.info(`[help] responding to message ${evt.d.id} `);
-    bot.sendMessage({
-      message: describeCommands(handlers),
-      to: channelID,
-    });
+  process: async (bot, logger, message) => {
+    logger.info(`[help] responding to message ${message.id} `);
+    message.reply(describeCommands(handlers));
   },
 } as IHandler);

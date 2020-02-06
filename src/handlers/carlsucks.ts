@@ -5,10 +5,10 @@ export default {
   command: '!carlsucks',
   description: 'the core functionality that shall never be removed',
 
-  applicable: (bot, logger, channelMessage) => /^!carlsucks/i.test(channelMessage.message) && !isBot(channelMessage),
+  applicable: (bot, logger, message) => /^!carlsucks/i.test(message.content) && !isBot(message),
 
-  process: (bot, logger, { channelID, evt }) => {
-    logger.info(`[carlsucks] responding to message ${evt.d.id}`);
-    bot.sendMessage({ message: 'HEJ på dig din jävel!', to: channelID });
+  process: (bot, logger, message) => {
+    logger.info(`[carlsucks] responding to message ${message.id}`);
+    message.reply('HEJ på dig din jävel!');
   },
 } as IHandler;

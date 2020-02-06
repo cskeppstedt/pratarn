@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import logger from './logger';
 import MemoryCache from './memory_cache';
 import randomInt from './random_int';
+import { IImgurGalleryImage } from '../types';
 
 require('dotenv').config();
 

@@ -1,6 +1,6 @@
+import Discord from 'discord.js';
 import { buildMap, generateSentence, tokenizeParagraphs } from 'oh-hi-markov';
 import {
-  IChannelMessage,
   IHandler,
   IHandlerProcess,
   IPratarnLogger,
@@ -25,7 +25,7 @@ const getUsernameFromMessage = (message: string) => message
 
 const getShowStats = (message: string) => message.includes('--stats');
 
-const shouldRespond = (channelMessage: IChannelMessage) => /^!prata/i.test(channelMessage.message);
+const shouldRespond = (message: Discord.Message) => /^!prata/i.test(message.content);
 
 const makeParagraphs = (messages: IStorageMessageView[]) => messages.map((message) => message.content);
 
@@ -76,28 +76,28 @@ const makeResponse = async (
 const respond: IHandlerProcess = async (
   bot,
   logger,
-  { channelID, message, evt },
+  message,
 ) => {
   try {
-    const targetUserName = getUsernameFromMessage(message) || getAuthorUsername(evt.d);
-    const showStats = getShowStats(message);
+    const targetUserName = getUsernameFromMessage(message.content) || getAuthorUsername(message);
+    const showStats = getShowStats(message.content);
     const responseMessage = await makeResponse(
       logger,
       targetUserName,
       showStats,
     );
     logger.info(
-      `[prata] responding to message ${evt.d.id} for username ${targetUserName}`,
+      `[prata] responding to message ${message.id} for username ${targetUserName}`,
     );
-    bot.sendMessage({ message: responseMessage, to: channelID });
+    message.reply(responseMessage);
   } catch (err) {
     logger.error(`[prata] error occurred, possible throttling - ${err}`);
     console.error(err);
   }
 };
 
-const recordMessage: IHandlerProcess = (bot, logger, channelMessage) => {
-  const messageView = toStorageMessageView(channelMessage.evt.d);
+const recordMessage: IHandlerProcess = (bot, logger, message) => {
+  const messageView = toStorageMessageView(message);
   logger.verbose(`[prata] recording message - ${messageView.id}`);
   insertMessageObject(messageView);
 };
@@ -108,14 +108,14 @@ export default {
     'generate markov chain text for a username, e.g.: !prata skepparn',
 
   applicable: (bot, logger, channelMessage) => (shouldRespond(channelMessage)
-      || shouldRecordMessage(channelMessage.evt.d))
+      || shouldRecordMessage(channelMessage))
     && !isBot(channelMessage),
 
-  process: (bot, logger, channelMessage) => {
-    if (shouldRespond(channelMessage)) {
-      respond(bot, logger, channelMessage);
-    } else if (shouldRecordMessage(channelMessage.evt.d)) {
-      recordMessage(bot, logger, channelMessage);
+  process: (bot, logger, message) => {
+    if (shouldRespond(message)) {
+      respond(bot, logger, message);
+    } else if (shouldRecordMessage(message)) {
+      recordMessage(bot, logger, message);
     }
   },
 } as IHandler;

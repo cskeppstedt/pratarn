@@ -1,5 +1,4 @@
 import Discord from 'discord.js';
-import http from 'http';
 import handlers from './handlers';
 import logger from './utils/logger';
 
@@ -12,82 +11,47 @@ if (!discordAuthToken) {
   process.exit(1);
 }
 
-const bot = new Discord.Client({ token: discordAuthToken });
+const bot = new Discord.Client();
 
 bot.on('ready', () => {
-  logger.info(
-    `[bot] connected - logged in as: ${bot.username} - id: ${bot.id}`,
-  );
+  logger.info(`[bot] connected - logged in as: ${bot.user.username} - id: ${bot.user.id}`);
 });
 
 bot.on(
   'message',
-  (
-    user: string,
-    userID: string,
-    channelID: string,
-    message: string,
-    evt: any,
-  ) => {
-    logger.verbose(
-      `[bot] message event - user: ${user} - userID: ${userID} - channelID: ${channelID}`
-        + ` - message: ${message} - evt: ${JSON.stringify(evt)}`,
-    );
+  (message) => {
+    logger.verbose([
+      '[bot] message event',
+      `user: ${message.author.username}`,
+      `userID: ${message.author.id}`,
+      `channelID: ${message.channel.id}`,
+      `message: ${message.content}`,
+    ].join(' - '));
 
-    const channelMessage = {
-      user,
-      userID,
-      channelID,
-      message,
-      evt,
-    };
-
-    const applicableHandlers = handlers.filter((handler) => handler.applicable(bot, logger, channelMessage));
+    const applicableHandlers = handlers.filter((handler) => handler.applicable(bot, logger, message));
 
     if (applicableHandlers.length > 0) {
       applicableHandlers.forEach((handler) => {
         logger.verbose(`[bot] running handler: ${handler.command}`);
-        handler.process(bot, logger, channelMessage);
+        handler.process(bot, logger, message);
       });
     }
   },
 );
 
-bot.on('disconnect', (errMsg, code) => {
-  logger.info(`[bot] disconnected - error: ${errMsg} - code ${code}`);
-  bot.connected = false; // doesn't seem to be reset by the lib
+bot.on('disconnect', (evt: any) => {
+  logger.info(`[bot] disconnected - evt: ${evt}`);
 
   setTimeout(() => {
     logger.info('[bot] attempting reconnect');
-    bot.connect();
+    bot.login(discordAuthToken);
   }, 3000);
 });
 
 logger.info(`[bot] handlers: ${handlers.map((h) => h.command).join(', ')}`);
 logger.info('[bot] attempting to connect');
 
-const server = http.createServer((req, res) => {
-  if (bot.connected) {
-    const body = 'Bot connected\n';
-    const contentLength = body.length;
-    res.writeHead(200, {
-      'Content-Length': contentLength,
-      'Content-Type': 'text/plain',
-    });
-    res.end(body);
-  } else {
-    const body = 'Bot not connected\n';
-    const contentLength = body.length;
-    res.writeHead(500, {
-      'Content-Length': contentLength,
-      'Content-Type': 'text/plain',
-    });
-    res.end(body);
-  }
-});
-
-server.listen(8080);
-bot.connect();
+bot.login(discordAuthToken);
 
 // handle program shutdown
 process.stdin.resume();
@@ -95,7 +59,7 @@ process.stdin.resume();
 function exitHandler(code: any) {
   logger.info(`[bot] shutdown requested, disconnecting - code: ${code}`);
   try {
-    bot.disconnect();
+    bot.destroy();
   } catch (err) {
     console.error(err);
   }

@@ -1,6 +1,6 @@
-import { IMessageObject } from '../types';
+import Discord from 'discord.js';
 
-export default (messageObject: IMessageObject) => {
+export default (messageObject: Discord.Message) => {
   if (/^!/.test(messageObject.content)) {
     return false;
   }
@@ -9,7 +9,7 @@ export default (messageObject: IMessageObject) => {
     return false;
   }
 
-  if (messageObject.webhook_id) {
+  if (messageObject.webhookID) {
     return false;
   }
 

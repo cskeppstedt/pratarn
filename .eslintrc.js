@@ -7,5 +7,6 @@ module.exports = {
     "no-console": "off",
     "import/prefer-default-export": "off",
     "max-len": "off"
-  }
+  },
+  "ignorePatterns": ["build/", "node_modules/"],
 };
