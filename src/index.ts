@@ -40,10 +40,10 @@ bot.on(
 );
 
 bot.on('disconnect', (evt: any) => {
-  logger.info(`[bot] disconnected - evt: ${evt}`);
+  logger.warn(`[bot] disconnected - evt: ${evt}`);
 
   setTimeout(() => {
-    logger.info('[bot] attempting reconnect');
+    logger.info('[bot] attempting to reconnect');
     bot.login(discordAuthToken);
   }, 3000);
 });
