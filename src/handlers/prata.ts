@@ -73,11 +73,7 @@ const makeResponse = async (
   return generatedMessages.join('\n\n');
 };
 
-const respond: IHandlerProcess = async (
-  bot,
-  logger,
-  message,
-) => {
+const respond: IHandlerProcess = async (bot, logger, message) => {
   try {
     const targetUserName = getUsernameFromMessage(message.content) || getAuthorUsername(message);
     const showStats = getShowStats(message.content);
@@ -98,7 +94,9 @@ const respond: IHandlerProcess = async (
 
 const recordMessage: IHandlerProcess = (bot, logger, message) => {
   const messageView = toStorageMessageView(message);
-  logger.verbose(`[prata] recording message - ${messageView.id}`);
+  logger.info(
+    `[prata] recording message - ${message.author.username} - ${messageView.id}`,
+  );
   insertMessageObject(messageView);
 };
 
@@ -107,8 +105,7 @@ export default {
   description:
     'generate markov chain text for a username, e.g.: !prata skepparn',
 
-  applicable: (bot, logger, channelMessage) => (shouldRespond(channelMessage)
-      || shouldRecordMessage(channelMessage))
+  applicable: (bot, logger, channelMessage) => (shouldRespond(channelMessage) || shouldRecordMessage(channelMessage))
     && !isBot(channelMessage),
 
   process: (bot, logger, message) => {
