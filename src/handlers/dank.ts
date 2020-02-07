@@ -10,7 +10,11 @@ export default {
 
   process: async (bot, logger, message) => {
     logger.info(`[dank] responding to message ${message.id} `);
-    const image = await randomGalleryImage({ subreddit: 'dankmemes' });
+    const image = await randomGalleryImage({
+      subreddit: 'dankmemes',
+      sort: 'top',
+      window: 'week',
+    });
     message.reply(image.link);
   },
 } as IHandler;
