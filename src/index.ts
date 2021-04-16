@@ -14,7 +14,7 @@ if (!discordAuthToken) {
 const bot = new Discord.Client();
 
 bot.on('ready', () => {
-  logger.info(`[bot] connected - logged in as: ${bot.user.username} - id: ${bot.user.id}`);
+  logger.info(`[bot] connected - logged in as: ${bot.user?.username} - id: ${bot.user?.id}`);
 });
 
 bot.on(
