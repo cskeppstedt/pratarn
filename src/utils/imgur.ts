@@ -6,7 +6,7 @@ import { IImgurGalleryImage } from '../types';
 
 require('dotenv').config();
 
-interface ISubredditGalleryOptions {
+export interface ISubredditGalleryOptions {
   subreddit: string;
   sort?: 'time' | 'top';
   window?: 'day' | 'week' | 'month' | 'year' | 'all';
@@ -50,7 +50,7 @@ export const randomGalleryImage = async ({
   subreddit,
   sort = 'time',
   window = 'month',
-  page = 1,
+  page = 0,
 }: ISubredditGalleryOptions) => {
   const key = cacheKey({
     subreddit,
