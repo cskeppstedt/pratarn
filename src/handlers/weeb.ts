@@ -20,7 +20,7 @@ export default {
     && !isBot(channelMessage),
 
   process: (bot, logger, message) => {
-    logger.info(`[memes] responding to message ${message.id} `);
+    logger.info(`[weeb] responding to message ${message.id} `);
     return replyImgurMessage(galleryOptions, message);
   },
 } as IHandler;
