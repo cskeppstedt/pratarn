@@ -6,6 +6,8 @@ import { IImgurGalleryImage } from '../types';
 
 require('dotenv').config();
 
+const reProtocol = /^(\w+)(:\/\/.*)$/;
+
 export interface ISubredditGalleryOptions {
   subreddit: string;
   sort?: 'time' | 'top';
@@ -36,7 +38,17 @@ const fetchGallery = async ({
 
   if (response.status === 200) {
     const json = await response.json();
-    return json.data as [IImgurGalleryImage];
+    const galleryImages = json.data as [IImgurGalleryImage];
+    return galleryImages.map(galleryImage => {
+      const [, protocol, rest] = (galleryImage.link || "").match(reProtocol) || [];
+      if (protocol === "https") {
+        return galleryImage;
+      }
+
+      const rewrittenLink = `https${rest}`;
+      logger.warn(`[imgur] rewriting link due to non-https protocol "${galleryImage.link}" => "${rewrittenLink}"`)
+      return { ...galleryImage, link: rewrittenLink }
+    })
   }
   logger.error(
     `[imgur] bad response: ${response.status} ${response.statusText}`,
