@@ -4,6 +4,7 @@ import logger from './utils/logger';
 
 require('dotenv').config();
 
+let isShuttingDown = false;
 const discordAuthToken: string = process.env.DISCORD_AUTH_TOKEN || '';
 
 if (!discordAuthToken) {
@@ -42,22 +43,24 @@ bot.on(
 bot.on('disconnect', (evt: any) => {
   logger.warn(`[bot] disconnected - evt: ${evt}`);
 
-  setTimeout(() => {
-    logger.info('[bot] attempting to reconnect');
-    bot.login(discordAuthToken);
-  }, 3000);
+  if (!isShuttingDown) {
+    setTimeout(() => {
+      logger.info('[bot] attempting to reconnect');
+      bot.login(discordAuthToken);
+    }, 3000);
+  }
 });
 
 logger.info(`[bot] working dir: ${process.cwd()}`);
 logger.info(`[bot] handlers: ${handlers.map((h) => h.command).join(', ')}`);
 logger.info('[bot] attempting to connect');
 
-bot.login(discordAuthToken);
-
-// handle program shutdown
-process.stdin.resume();
-
 function exitHandler(code: any) {
+  if (isShuttingDown) {
+    return;
+  }
+
+  isShuttingDown = true;
   logger.info(`[bot] shutdown requested, disconnecting - code: ${code}`);
   try {
     bot.destroy();
@@ -72,3 +75,5 @@ process.on('SIGINT', exitHandler.bind(null));
 process.on('SIGUSR1', exitHandler.bind(null));
 process.on('SIGUSR2', exitHandler.bind(null));
 process.on('uncaughtException', exitHandler.bind(null));
+
+bot.login(discordAuthToken);
