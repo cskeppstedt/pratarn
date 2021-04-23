@@ -3,7 +3,7 @@ import { ISubredditGalleryOptions } from '../utils/imgur';
 import isBot from '../utils/is_bot';
 import replyImgurMessage, { commandDescription } from '../utils/reply_imgur_message';
 
-const galleryOptions: ISubredditGalleryOptions = {
+export const galleryOptions: ISubredditGalleryOptions = {
   subreddit: 'memes',
   sort: 'top',
   window: 'month',

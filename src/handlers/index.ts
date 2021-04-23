@@ -5,7 +5,8 @@ import help from './help';
 import memes from './memes';
 import mymlan from './mymlan';
 import prata from './prata';
+import ree from './ree';
 
-const handlers = [dank, memes, weeb, prata, carlsucks, mymlan];
+const handlers = [dank, memes, weeb, prata, carlsucks, mymlan, ree];
 
 export default [...handlers, help(handlers)];
