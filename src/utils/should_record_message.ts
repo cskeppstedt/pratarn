@@ -1,4 +1,4 @@
-import Discord from 'discord.js';
+import Discord from "discord.js";
 
 export default (messageObject: Discord.Message) => {
   if (/^!/.test(messageObject.content)) {
@@ -9,14 +9,14 @@ export default (messageObject: Discord.Message) => {
     return false;
   }
 
-  if (messageObject.webhookID) {
+  if (messageObject.webhookId) {
     return false;
   }
 
   if (
-    messageObject.content === null
-    || messageObject.content === undefined
-    || messageObject.content === ''
+    messageObject.content === null ||
+    messageObject.content === undefined ||
+    messageObject.content === ""
   ) {
     return false;
   }

@@ -1,26 +1,29 @@
-import { IHandler } from '../types';
-import { ISubredditGalleryOptions } from '../utils/imgur';
-import isBot from '../utils/is_bot';
-import replyImgurMessage, { commandDescription } from '../utils/reply_imgur_message';
+import { SlashCommandBuilder } from "discord.js";
+import { IHandler } from "../types";
+import { ISubredditGalleryOptions } from "../utils/imgur";
+import replyImgurMessage, {
+  commandDescription,
+} from "../utils/reply_imgur_message";
 
 export const galleryOptions: ISubredditGalleryOptions = {
-  subreddit: 'Animemes',
-  sort: 'top',
-  window: 'month',
+  subreddit: "Animemes",
+  sort: "top",
+  window: "month",
 };
 
-export default {
-  command: '!weeb',
-  description: commandDescription(galleryOptions),
+const NAME = "weeb";
 
-  applicable: (bot, logger, channelMessage) => (/^!weeb/i.test(channelMessage.content)
-      || /^!animemes/i.test(channelMessage.content)
-      || /^!senpai/i.test(channelMessage.content)
-      || /^!sensei/i.test(channelMessage.content))
-    && !isBot(channelMessage),
+const weeb: IHandler = {
+  name: NAME,
 
-  process: (bot, logger, message) => {
-    logger.info(`[weeb] responding to message ${message.id} `);
-    return replyImgurMessage(galleryOptions, message);
+  command: new SlashCommandBuilder()
+    .setName(NAME)
+    .setDescription(commandDescription(galleryOptions)),
+
+  execute: (bot, logger, interaction) => {
+    logger.info(`[weeb] responding to message ${interaction.id} `);
+    return replyImgurMessage(galleryOptions, interaction);
   },
-} as IHandler;
+};
+
+export default weeb;

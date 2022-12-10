@@ -1,14 +1,22 @@
-import { IHandler } from '../types';
-import isBot from '../utils/is_bot';
+import { SlashCommandBuilder } from "discord.js";
+import { IHandler } from "../types";
 
-export default {
-  command: '!carlsucks',
-  description: 'the core functionality that shall never be removed',
+const NAME = "carlsucks";
 
-  applicable: (bot, logger, message) => /^!carlsucks/i.test(message.content) && !isBot(message),
+const carlsucks: IHandler = {
+  name: NAME,
 
-  process: (bot, logger, message) => {
-    logger.info(`[carlsucks] responding to message ${message.id}`);
-    message.reply('HEJ på dig din jävel!');
+  command: new SlashCommandBuilder()
+    .setName(NAME)
+    .setDescription("the core functionality that shall never be removed"),
+
+  execute: (bot, logger, interaction) => {
+    logger.info(`[carlsucks] responding to message ${interaction.id}`);
+    if (interaction.isRepliable())
+      return interaction.reply({
+        content: "HEJ på dig din jävel!",
+      });
   },
-} as IHandler;
+};
+
+export default carlsucks;

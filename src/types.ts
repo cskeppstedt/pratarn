@@ -1,5 +1,11 @@
-import Discord from 'discord.js';
-import winston from 'winston';
+import Discord, {
+  CommandInteraction,
+  Interaction,
+  SharedSlashCommandOptions,
+  SlashCommandBuilder,
+  SlashCommandSubcommandBuilder,
+} from "discord.js";
+import winston from "winston";
 
 export type IPratarnLogger = winston.Logger;
 
@@ -30,14 +36,18 @@ export type IHandlerApplicable = (
 export type IHandlerProcess = (
   bot: Discord.Client,
   logger: winston.Logger,
-  channelMessage: Discord.Message
-) => void;
+  interaction: CommandInteraction
+) => void | Promise<any>;
 
-export interface IHandler {
-  applicable: IHandlerApplicable;
-  command: string;
-  description: string;
-  process: IHandlerProcess;
+export interface IHandler<
+  T =
+    | SlashCommandBuilder
+    | SharedSlashCommandOptions<true>
+    | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+> {
+  name: string;
+  command: T;
+  execute: IHandlerProcess;
 }
 
 export interface IImgurGalleryImage {

@@ -1,41 +1,42 @@
-import Discord from 'discord.js';
-import { buildMap, generateSentence, tokenizeParagraphs } from 'oh-hi-markov';
+import Discord, { Interaction, SlashCommandBuilder } from "discord.js";
+import { buildMap, generateSentence, tokenizeParagraphs } from "oh-hi-markov";
+import winston from "winston";
 import {
   IHandler,
   IHandlerProcess,
   IPratarnLogger,
   IStorageMessageView,
-} from '../types';
+} from "../types";
 import {
   fetchMessageObjectsCached,
   insertMessageObject,
-} from '../utils/dynamo';
-import isBot from '../utils/is_bot';
-import normalizeUsername from '../utils/normalize_username';
-import randomInt from '../utils/random_int';
-import shouldRecordMessage from '../utils/should_record_message';
+} from "../utils/dynamo";
+import isBot from "../utils/is_bot";
+import normalizeUsername from "../utils/normalize_username";
+import randomInt from "../utils/random_int";
+import shouldRecordMessage from "../utils/should_record_message";
 import toStorageMessageView, {
   getAuthorUsername,
-} from '../utils/to_storage_message_view';
+} from "../utils/to_storage_message_view";
 
-const getUsernameFromMessage = (message: string) => message
-  .replace(/(--\w+)/g, '')
-  .substr('!prata'.length)
-  .trim();
+const getUsernameFromMessage = (message: string) =>
+  message
+    .replace(/(--\w+)/g, "")
+    .substr("!prata".length)
+    .trim();
 
-const getShowStats = (message: string) => message.includes('--stats');
+const getShowStats = (message: string) => message.includes("--stats");
 
-const shouldRespond = (message: Discord.Message) => /^!prata/i.test(message.content);
-
-const makeParagraphs = (messages: IStorageMessageView[]) => messages.map((message) => message.content);
+const makeParagraphs = (messages: IStorageMessageView[]) =>
+  messages.map((message) => message.content);
 
 const makeResponse = async (
   logger: IPratarnLogger,
   username: string,
-  showStats: boolean,
+  showStats: boolean
 ) => {
   const { messageObjects } = await fetchMessageObjectsCached(
-    normalizeUsername(username),
+    normalizeUsername(username)
   );
 
   if (messageObjects.length === 0) {
@@ -55,7 +56,7 @@ const makeResponse = async (
     `${messageObjects.length} messages`,
     `${Object.keys(map).length} map keys`,
     `target: ${numSentences} sentences, ${numWords} words, prefix length ${prefixLength}`,
-  ].join(' - ')} ]`;
+  ].join(" - ")} ]`;
 
   logger.verbose(`[prata] ${stats}`);
 
@@ -66,53 +67,67 @@ const makeResponse = async (
 
   for (let i = 0; i < numSentences; i += 1) {
     generatedMessages.push(
-      generateSentence({ tokenMap: map, maxLength: numWords, prefixLength }),
+      generateSentence({ tokenMap: map, maxLength: numWords, prefixLength })
     );
   }
 
-  return generatedMessages.join('\n\n');
+  return generatedMessages.join("\n\n");
 };
 
-const respond: IHandlerProcess = async (bot, logger, message) => {
+const respond: IHandlerProcess = async (bot, logger, interaction) => {
   try {
-    const targetUserName = getUsernameFromMessage(message.content) || getAuthorUsername(message);
-    const showStats = getShowStats(message.content);
+    const targetUserName = interaction.options.get("user")?.user?.username;
+    if (!targetUserName) {
+      return;
+    }
+
+    await interaction.deferReply();
+    const showStats = false;
     const responseMessage = await makeResponse(
       logger,
       targetUserName,
-      showStats,
+      showStats
     );
     logger.info(
-      `[prata] responding to message ${message.id} for username ${targetUserName}`,
+      `[prata] responding to message ${interaction.id} for username ${targetUserName}`
     );
-    message.reply(responseMessage);
-  } catch (err) {
+    interaction.editReply({ content: responseMessage });
+  } catch (err: any) {
     logger.error(`[prata] error occurred, possible throttling - ${err}`);
     console.error(err);
+    interaction.editReply({ content: err?.message || "Error :(" });
   }
 };
 
-const recordMessage: IHandlerProcess = (bot, logger, message) => {
-  const messageView = toStorageMessageView(message);
-  logger.info(
-    `[prata] recording message - ${message.author.username} - ${messageView.id}`,
-  );
-  insertMessageObject(messageView);
+// TODO
+// const recordMessage: IHandlerProcess = (bot, logger, message) => {
+//   const messageView = toStorageMessageView(message);
+//   logger.info(
+//     `[prata] recording message - ${message.author.username} - ${messageView.id}`
+//   );
+//   insertMessageObject(messageView);
+// };
+
+const NAME = "prata";
+
+const prata: IHandler = {
+  name: NAME,
+
+  command: new SlashCommandBuilder()
+    .setName(NAME)
+    .setDescription(
+      "generate markov chain text for a username, e.g.: !prata skepparn"
+    )
+    .addUserOption((opt) =>
+      opt
+        .setName("user")
+        .setDescription("the username that should prata")
+        .setRequired(true)
+    ),
+
+  execute: (bot, logger, interaction) => {
+    respond(bot, logger, interaction);
+  },
 };
 
-export default {
-  command: '!prata',
-  description:
-    'generate markov chain text for a username, e.g.: !prata skepparn',
-
-  applicable: (bot, logger, channelMessage) => (shouldRespond(channelMessage) || shouldRecordMessage(channelMessage))
-    && !isBot(channelMessage),
-
-  process: (bot, logger, message) => {
-    if (shouldRespond(message)) {
-      respond(bot, logger, message);
-    } else if (shouldRecordMessage(message)) {
-      recordMessage(bot, logger, message);
-    }
-  },
-} as IHandler;
+export default prata;

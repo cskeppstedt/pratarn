@@ -11,16 +11,17 @@ import {
   NormalizedUsername,
 } from "../types";
 import MemoryCache from "./memory_cache";
+import { assertReadEnv, readEnv } from "./readEnv";
 
 require("dotenv").config();
 
 const documentClient = DynamoDBDocumentClient.from(
   new DynamoDBClient({
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      accessKeyId: assertReadEnv("AWS_ACCESS_KEY_ID"),
+      secretAccessKey: assertReadEnv("AWS_SECRET_ACCESS_KEY"),
     },
-    region: process.env.AWS_DEFAULT_REGION,
+    region: readEnv("AWS_DEFAULT_REGION"),
   })
 );
 
