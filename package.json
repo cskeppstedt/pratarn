@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/lib-dynamodb": "^3.213.0",
+    "@aws-sdk/client-dynamodb": "^3.226.0",
+    "@aws-sdk/lib-dynamodb": "^3.226.0",
     "bufferutil": "^4.0.7",
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
