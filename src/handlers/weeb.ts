@@ -1,11 +1,15 @@
 import { SlashCommandBuilder } from "discord.js";
 import { ICommandHandler } from "../types";
-import { ISubredditGalleryOptions } from "../utils/imgur";
-import replyImgurMessage, {
+import {
+  ISubredditGalleryOptions,
+  ISubredditGalleryOptionsInput,
+} from "../utils/imgur";
+import {
+  replyCommandInteraction,
   commandDescription,
 } from "../utils/reply_imgur_message";
 
-export const galleryOptions: ISubredditGalleryOptions = {
+export const galleryOptions: ISubredditGalleryOptionsInput = {
   subreddit: "Animemes",
   sort: "top",
   window: "month",
@@ -22,7 +26,7 @@ const weeb: ICommandHandler = {
 
   handleCommand: (bot, logger, interaction) => {
     logger.info(`[weeb] responding to message ${interaction.id} `);
-    return replyImgurMessage(galleryOptions, interaction);
+    return replyCommandInteraction(galleryOptions, interaction);
   },
 };
 

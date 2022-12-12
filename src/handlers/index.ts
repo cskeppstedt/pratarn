@@ -4,18 +4,9 @@ import dank from "./dank";
 import memes from "./memes";
 import mymlan from "./mymlan";
 import prata from "./prata";
-import ree from "./ree";
 import { ICommandHandler, IHandler, IMessageHandler } from "../types";
 
-const allHandlers: IHandler[] = [
-  dank,
-  memes,
-  weeb,
-  mymlan,
-  prata,
-  carlsucks,
-  ree,
-];
+const allHandlers: IHandler[] = [dank, memes, weeb, mymlan, prata, carlsucks];
 
 const isCommandHandler = (handler: IHandler): handler is ICommandHandler => {
   return "handleCommand" in handler;

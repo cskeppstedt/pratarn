@@ -3,6 +3,7 @@ import { commandHandlers, messageHandlers } from "./handlers";
 import { IHandler } from "./types";
 import logger from "./utils/logger";
 import { assertReadEnv } from "./utils/readEnv";
+import { REE_BUTTON_ID, updateMessageRee } from "./utils/reply_imgur_message";
 
 require("dotenv").config();
 
@@ -35,11 +36,20 @@ bot.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isCommand()) {
     return;
   }
-
   const handler = commandHandlers.get(interaction.commandName);
   if (handler) {
     logger.verbose(`[bot] running command handler: ${handler.name}`);
     await handler.handleCommand(bot, logger, interaction);
+  }
+});
+
+bot.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isButton()) {
+    return;
+  }
+  if (interaction.customId === REE_BUTTON_ID) {
+    logger.info(`[bot] running button handler: ${REE_BUTTON_ID}`);
+    await updateMessageRee(interaction);
   }
 });
 

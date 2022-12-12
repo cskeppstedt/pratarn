@@ -9,12 +9,27 @@ require("dotenv").config();
 
 const reProtocol = /^(\w+)(:\/\/.*)$/;
 
-export interface ISubredditGalleryOptions {
+export enum GallerySort {
+  time = "time",
+  top = "top",
+}
+
+export enum GalleryWindow {
+  day = "day",
+  week = "week",
+  month = "month",
+  year = "year",
+  all = "all",
+}
+
+export interface ISubredditGalleryOptionsInput {
   subreddit: string;
   sort?: "time" | "top";
   window?: "day" | "week" | "month" | "year" | "all";
   page?: number;
 }
+
+export type ISubredditGalleryOptions = Required<ISubredditGalleryOptionsInput>;
 
 const cacheKey = (options: ISubredditGalleryOptions) =>
   `gallery=${options.subreddit} - sort=${options.sort} - window=${options.window} - page=${options.page}`;
@@ -67,25 +82,41 @@ const fetchGallery = async ({
 
 const galleryCache = new MemoryCache(60 * 60);
 
-export const randomGalleryImage = async ({
-  subreddit,
-  sort = "time",
-  window = "month",
-  page = 0,
-}: ISubredditGalleryOptions) => {
-  const key = cacheKey({
-    subreddit,
-    sort,
-    window,
-    page,
-  });
-  const images = await galleryCache.get(key, () =>
-    fetchGallery({
-      subreddit,
-      sort,
-      window,
-      page,
-    })
-  );
-  return images[randomInt(images.length - 1)];
+export const randomGalleryImage = async (
+  optionsInput: ISubredditGalleryOptionsInput
+) => {
+  const options: ISubredditGalleryOptions = {
+    subreddit: optionsInput.subreddit,
+    sort: optionsInput.sort || "time",
+    window: optionsInput.window || "month",
+    page: optionsInput.page ?? 0,
+  };
+  const key = cacheKey(options);
+  const images = await galleryCache.get(key, () => fetchGallery(options));
+  const image = images[randomInt(images.length - 1)];
+  return { image, options };
 };
+
+function isNonEmptyString(input: string | null | undefined): input is string {
+  return input != null && input.length > 0;
+}
+
+function isValidSort(input: string | null | undefined): input is GallerySort {
+  return input != null && input in GallerySort;
+}
+
+function isValidWindow(
+  input: string | null | undefined
+): input is GalleryWindow {
+  return input != null && input in GalleryWindow;
+}
+
+export function isValidOptionsInput(
+  input: Partial<ISubredditGalleryOptionsInput>
+): input is ISubredditGalleryOptionsInput {
+  return (
+    isNonEmptyString(input.subreddit) &&
+    isValidSort(input.sort) &&
+    isValidWindow(input.window)
+  );
+}
