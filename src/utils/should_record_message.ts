@@ -1,6 +1,6 @@
-import Discord from "discord.js";
+import { Message } from "discord.js";
 
-export default (messageObject: Discord.Message) => {
+export default (messageObject: Message) => {
   if (/^!/.test(messageObject.content)) {
     return false;
   }

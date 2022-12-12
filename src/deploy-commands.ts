@@ -1,22 +1,22 @@
 import { REST, Routes } from "discord.js";
 import { assertReadEnv } from "./utils/readEnv";
-import handlers from "./handlers";
+import { commandHandlers } from "./handlers";
 
-const applicationId = assertReadEnv("DISCORD_APPLICATION_ID");
-const token = assertReadEnv("DISCORD_AUTH_TOKEN");
+const deployCommands = async () => {
+  const applicationId = assertReadEnv("DISCORD_APPLICATION_ID");
+  const token = assertReadEnv("DISCORD_AUTH_TOKEN");
 
-const commands = [...handlers.values()].map((handler) => {
-  console.log(" - serializing", handler.name);
-  const serialized = (handler.command as any).toJSON();
-  console.log(serialized);
-  return serialized;
-});
+  const commands = [...commandHandlers.values()].map((handler) => {
+    console.log(" - serializing", handler.name);
+    const serialized = (handler.command as any).toJSON();
+    console.log(serialized);
+    return serialized;
+  });
 
-// Construct and prepare an instance of the REST module
-const rest = new REST({ version: "10" }).setToken(token);
+  // Construct and prepare an instance of the REST module
+  const rest = new REST({ version: "10" }).setToken(token);
 
-// and deploy your commands!
-(async () => {
+  // and deploy your commands!
   try {
     console.log(
       `Started refreshing ${commands.length} application (/) commands.`
@@ -33,4 +33,6 @@ const rest = new REST({ version: "10" }).setToken(token);
     // And of course, make sure you catch and log any errors!
     console.error(error);
   }
-})();
+};
+
+deployCommands();

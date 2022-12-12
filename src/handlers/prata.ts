@@ -1,9 +1,10 @@
-import Discord, { Interaction, SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { buildMap, generateSentence, tokenizeParagraphs } from "oh-hi-markov";
-import winston from "winston";
 import {
-  IHandler,
-  IHandlerProcess,
+  ICommandHandler,
+  IHandleCommand,
+  IHandleMessage,
+  IMessageHandler,
   IPratarnLogger,
   IStorageMessageView,
 } from "../types";
@@ -11,7 +12,6 @@ import {
   fetchMessageObjectsCached,
   insertMessageObject,
 } from "../utils/dynamo";
-import isBot from "../utils/is_bot";
 import normalizeUsername from "../utils/normalize_username";
 import randomInt from "../utils/random_int";
 import shouldRecordMessage from "../utils/should_record_message";
@@ -74,7 +74,7 @@ const makeResponse = async (
   return generatedMessages.join("\n\n");
 };
 
-const respond: IHandlerProcess = async (bot, logger, interaction) => {
+const respond: IHandleCommand = async (bot, logger, interaction) => {
   try {
     const targetUserName = interaction.options.get("user")?.user?.username;
     if (!targetUserName) {
@@ -99,18 +99,17 @@ const respond: IHandlerProcess = async (bot, logger, interaction) => {
   }
 };
 
-// TODO
-// const recordMessage: IHandlerProcess = (bot, logger, message) => {
-//   const messageView = toStorageMessageView(message);
-//   logger.info(
-//     `[prata] recording message - ${message.author.username} - ${messageView.id}`
-//   );
-//   insertMessageObject(messageView);
-// };
+const recordMessage: IHandleMessage = (bot, logger, message) => {
+  const messageView = toStorageMessageView(message);
+  logger.info(
+    `[prata] recording message - ${message.author.username} - ${messageView.id}`
+  );
+  return insertMessageObject(messageView);
+};
 
 const NAME = "prata";
 
-const prata: IHandler = {
+const prata: ICommandHandler & IMessageHandler = {
   name: NAME,
 
   command: new SlashCommandBuilder()
@@ -125,8 +124,14 @@ const prata: IHandler = {
         .setRequired(true)
     ),
 
-  execute: (bot, logger, interaction) => {
-    respond(bot, logger, interaction);
+  handleCommand: async (bot, logger, interaction) => {
+    return respond(bot, logger, interaction);
+  },
+
+  handleMessage: async (bot, logger, message) => {
+    if (shouldRecordMessage(message)) {
+      return recordMessage(bot, logger, message);
+    }
   },
 };
 

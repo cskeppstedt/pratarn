@@ -1,5 +1,6 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
-import handlers from "./handlers";
+import { Client, Events, GatewayIntentBits, Partials } from "discord.js";
+import { commandHandlers, messageHandlers } from "./handlers";
+import { IHandler } from "./types";
 import logger from "./utils/logger";
 import { assertReadEnv } from "./utils/readEnv";
 
@@ -14,7 +15,14 @@ if (!discordAuthToken) {
 }
 
 const bot = new Client({
-  intents: [GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages],
+  intents: [
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+  partials: [Partials.Channel],
 });
 
 bot.once(Events.ClientReady, () => {
@@ -23,38 +31,31 @@ bot.once(Events.ClientReady, () => {
   );
 });
 
-bot.on(Events.InteractionCreate, (interaction) => {
-  if (interaction.isCommand()) {
-    const handler = handlers.get(interaction.commandName);
-    if (handler) {
-      logger.verbose(`[bot] running handler: ${handler.name}`);
-      handler.execute(bot, logger, interaction);
-    }
+bot.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isCommand()) {
+    return;
+  }
+
+  const handler = commandHandlers.get(interaction.commandName);
+  if (handler) {
+    logger.verbose(`[bot] running command handler: ${handler.name}`);
+    await handler.handleCommand(bot, logger, interaction);
   }
 });
 
-// bot.on(Events.MessageCreate, (message) => {
-//   logger.verbose(
-//     [
-//       "[bot] message event",
-//       `user: ${message.author.username}`,
-//       `userID: ${message.author.id}`,
-//       `channelID: ${message.channel.id}`,
-//       `message: ${message.content}`,
-//     ].join(" - ")
-//   );
-
-//   const applicableHandlers = handlers.filter((handler) =>
-//     handler.applicable(bot, logger, message)
-//   );
-
-//   if (applicableHandlers.length > 0) {
-//     applicableHandlers.forEach((handler) => {
-//       logger.verbose(`[bot] running handler: ${handler.command}`);
-//       handler.execute(bot, logger, message);
-//     });
-//   }
-// });
+bot.on(Events.MessageCreate, async (message) => {
+  await Promise.allSettled(
+    messageHandlers.map(async (handler) => {
+      logger.verbose(`[bot] running message handler: ${handler.name}`);
+      try {
+        return await handler.handleMessage(bot, logger, message);
+      } catch (err) {
+        logger.error(`[bot] message handler [${handler.name}]: ${err}`);
+        console.error(err);
+      }
+    })
+  );
+});
 
 bot.on(Events.ShardDisconnect, (evt: any) => {
   logger.warn(`[bot] disconnected - evt`, { evt });
@@ -67,8 +68,19 @@ bot.on(Events.ShardDisconnect, (evt: any) => {
   }
 });
 
+bot.on(Events.Error, (err) => {
+  logger.info(`[bot] error: ${err}`);
+  console.error(err);
+});
+
+const formatHandlers = (handlers: IHandler[]) =>
+  [...handlers.map((handler) => handler.name)].join(", ");
+
 logger.info(`[bot] working dir: ${process.cwd()}`);
-logger.info(`[bot] handlers: ${[...handlers.keys()].join(", ")}`);
+logger.info(
+  `[bot] command handlers: ${formatHandlers([...commandHandlers.values()])}`
+);
+logger.info(`[bot] message handlers: ${formatHandlers(messageHandlers)}`);
 logger.info("[bot] attempting to connect");
 
 function exitHandler(code: any) {

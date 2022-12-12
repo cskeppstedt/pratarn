@@ -5,11 +5,8 @@ import {
   PutCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import {
-  IFetchMessageObjectsResponse,
-  IStorageMessageView,
-  NormalizedUsername,
-} from "../types";
+import { User } from "discord.js";
+import { IFetchMessageObjectsResponse, IStorageMessageView } from "../types";
 import MemoryCache from "./memory_cache";
 import { assertReadEnv, readEnv } from "./readEnv";
 
@@ -48,7 +45,7 @@ export const insertMessageObjects = (messageObjects: IStorageMessageView[]) => {
   return documentClient.send(new BatchWriteCommand(params));
 };
 
-export const fetchMessageObjects = async (username: NormalizedUsername) => {
+export const fetchMessageObjects = async (username: User["username"]) => {
   const params = {
     TableName: TABLE_NAME,
     KeyConditionExpression: "author_username = :author_username",
@@ -62,7 +59,7 @@ export const fetchMessageObjects = async (username: NormalizedUsername) => {
   } as IFetchMessageObjectsResponse;
 };
 
-export const fetchMessageObjectsCached = async (username: NormalizedUsername) =>
+export const fetchMessageObjectsCached = async (username: User["username"]) =>
   messagesCache.get(username, () =>
     fetchMessageObjects(username)
   ) as Promise<IFetchMessageObjectsResponse>;

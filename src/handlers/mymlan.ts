@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { IHandler } from "../types";
+import { ICommandHandler } from "../types";
 import repeat from "../utils/repeat";
 
 const asciiChatBubble = (chatBubbleMessage: string) =>
@@ -30,7 +30,7 @@ const asciiDogMessage = (chatBubbleMessage: string) =>
 const MESSAGE_OPTION = "message";
 const NAME = "mymlan";
 
-const mymlan: IHandler = {
+const mymlan: ICommandHandler = {
   name: NAME,
 
   command: new SlashCommandBuilder()
@@ -42,11 +42,11 @@ const mymlan: IHandler = {
         .setDescription("the message that mymlan should mymla")
     ),
 
-  execute: (bot, logger, interaction) => {
+  handleCommand: async (bot, logger, interaction) => {
     const message = interaction.options.get(MESSAGE_OPTION)?.value;
     if (typeof message === "string" && message) {
       logger.info(`[mymlan] responding to message ${interaction.id} `);
-      interaction.reply(asciiDogMessage(message));
+      return interaction.reply(asciiDogMessage(message));
     }
   },
 };

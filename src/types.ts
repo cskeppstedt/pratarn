@@ -1,20 +1,21 @@
 import Discord, {
+  Channel,
   CommandInteraction,
-  Interaction,
+  Message,
   SharedSlashCommandOptions,
   SlashCommandBuilder,
-  SlashCommandSubcommandBuilder,
+  User,
 } from "discord.js";
 import winston from "winston";
 
 export type IPratarnLogger = winston.Logger;
 
 export interface IStorageMessageView {
-  author_id: snowflake;
-  author_username: NormalizedUsername;
-  channel_id: snowflake;
+  author_id: User["id"];
+  author_username: User["username"];
+  channel_id: Channel["id"];
   content: string;
-  id: snowflake;
+  id: Message["id"];
   timestamp: ISO8601Timestamp;
 }
 
@@ -23,23 +24,21 @@ export interface IFetchMessageObjectsResponse {
   messageObjects: IStorageMessageView[];
 }
 
-export type snowflake = string;
 export type ISO8601Timestamp = string;
-export type NormalizedUsername = string;
 
-export type IHandlerApplicable = (
-  bot: Discord.Client,
-  logger: winston.Logger,
-  channelMessage: Discord.Message
-) => boolean;
-
-export type IHandlerProcess = (
+export type IHandleCommand = (
   bot: Discord.Client,
   logger: winston.Logger,
   interaction: CommandInteraction
-) => void | Promise<any>;
+) => Promise<any>;
 
-export interface IHandler<
+export type IHandleMessage = (
+  bot: Discord.Client,
+  logger: winston.Logger,
+  message: Message
+) => Promise<any>;
+
+export interface ICommandHandler<
   T =
     | SlashCommandBuilder
     | SharedSlashCommandOptions<true>
@@ -47,8 +46,22 @@ export interface IHandler<
 > {
   name: string;
   command: T;
-  execute: IHandlerProcess;
+  handleCommand: IHandleCommand;
+  handleMessage?: IHandleMessage;
 }
+
+export interface IMessageHandler<
+  T =
+    | SlashCommandBuilder
+    | SharedSlashCommandOptions<true>
+    | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+> {
+  name: string;
+  command: T;
+  handleMessage: IHandleMessage;
+}
+
+export type IHandler = ICommandHandler | IMessageHandler;
 
 export interface IImgurGalleryImage {
   /** The ID for the image */

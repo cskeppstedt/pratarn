@@ -1,5 +1,5 @@
 import { Collection, Message, SlashCommandBuilder } from "discord.js";
-import { IHandler } from "../types";
+import { ICommandHandler } from "../types";
 import { randomGalleryImage } from "../utils/imgur";
 import { formatImgurMessage } from "../utils/reply_imgur_message";
 import { galleryOptions as dankGalleryOptions } from "./dank";
@@ -32,7 +32,7 @@ const getGalleryOptions = (msg: Message | null | void) => {
 
 const NAME = "ree";
 
-const ree: IHandler = {
+const ree: ICommandHandler = {
   name: NAME,
 
   command: new SlashCommandBuilder()
@@ -41,7 +41,7 @@ const ree: IHandler = {
       "The last !dank meme was shit? Replace it with !reeeeeeeee"
     ),
 
-  execute: async (bot, logger, interaction) => {
+  handleCommand: async (bot, logger, interaction) => {
     logger.info(`[ree] responding to message ${interaction.id} `);
     if (!interaction.channel) {
       interaction.reply("sry funkar bara i en kanal");
